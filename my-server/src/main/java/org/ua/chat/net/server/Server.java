@@ -1,7 +1,6 @@
 package org.ua.chat.net.server;
 
-import java.io.IOException;
 
 public interface Server extends AutoCloseable {
-    void start() throws IOException;
+    void start() throws Exception;
 }

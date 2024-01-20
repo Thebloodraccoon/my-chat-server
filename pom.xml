@@ -12,6 +12,7 @@
 
     <modules>
         <module>my-server</module>
+        <module>my-client</module>
     </modules>
 
     <properties>

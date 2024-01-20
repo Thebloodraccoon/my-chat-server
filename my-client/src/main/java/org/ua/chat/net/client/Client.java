@@ -1,2 +1,5 @@
-package org.ua.chat.net.client;public class Client {
+package org.ua.chat.net.client;
+
+public interface Client extends AutoCloseable {
+    void connect();
 }

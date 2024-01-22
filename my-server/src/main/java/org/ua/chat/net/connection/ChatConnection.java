@@ -6,5 +6,4 @@ public interface ChatConnection extends AutoCloseable{
     void sendMessage(String message);
     void close();
     String getName();
-
 }

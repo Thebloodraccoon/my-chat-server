@@ -2,26 +2,35 @@ package org.ua.chat.net.connection;
 
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import org.ua.chat.net.server.ChatHandler;
 
 import java.io.*;
 import java.net.Socket;
-
+import java.time.LocalDateTime;
+import java.util.Random;
 
 
 @EqualsAndHashCode
 public class ThreadChatConnection implements ChatConnection, Runnable {
     private final Socket socket;
     private final ChatHandler handler;
+    private final LocalDateTime connectionTime;
+    private String name;
     private BufferedReader reader;
     private PrintWriter writer;
-    private String name;
 
     public ThreadChatConnection(Socket socket, ChatHandler handler) {
         this.socket = socket;
         this.handler = handler;
+        this.name = generateRandomName();
+        this.connectionTime = LocalDateTime.now();
     }
+
+    private String generateRandomName() {
+        Random random = new Random();
+        return "client-" + random.nextInt(1000);
+    }
+
 
     @Override
     public void sendMessage(String message) {
@@ -35,6 +44,10 @@ public class ThreadChatConnection implements ChatConnection, Runnable {
     }
 
     @Override
+    public Socket getSocket() {
+        return socket;
+    }
+    @Override
     public void run() {
         try (socket;
              final InputStream inputStream = socket.getInputStream();
@@ -43,9 +56,7 @@ public class ThreadChatConnection implements ChatConnection, Runnable {
             reader = new BufferedReader(new InputStreamReader(inputStream));
             writer = new PrintWriter(new OutputStreamWriter(outputStream), true);
 
-            writer.println("Welcome to the chat. Enter your name:");
-
-            name = reader.readLine();
+            writer.println("Welcome " + getName() + " to the chat. ");
 
             this.handler.onConnect(this);
 

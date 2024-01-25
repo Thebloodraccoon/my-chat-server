@@ -12,10 +12,10 @@ public class CommandManager {
         commands.put(commandName, command);
     }
 
-    public void executeCommand(ChatConnection connection, String commandName, String[] args) throws Exception {
+    public void executeCommand(ChatConnection connection, String commandName, String arg) throws Exception {
         Command command = commands.get(commandName);
         if (command != null) {
-            command.execute(connection, args);
+            command.execute(connection, arg);
         }
     }
 }

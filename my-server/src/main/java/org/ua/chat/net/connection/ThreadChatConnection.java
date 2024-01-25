@@ -44,6 +44,10 @@ public class ThreadChatConnection implements ChatConnection, Runnable {
     }
 
     @Override
+    public Socket getSocket() {
+        return socket;
+    }
+    @Override
     public void run() {
         try (socket;
              final InputStream inputStream = socket.getInputStream();

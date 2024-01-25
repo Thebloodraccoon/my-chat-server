@@ -2,9 +2,41 @@ package org.ua.chat.net.command;
 
 import org.ua.chat.net.connection.ChatConnection;
 
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class FileCommand implements Command {
+    private static final String SERVER_FILES_DIRECTORY = "server-files/";
+
     @Override
-    public void execute(ChatConnection connection, String[] args) {
-        System.out.println("FILE");
+    public void execute(ChatConnection connection, String filePath) {
+        try {
+            Path path = Paths.get(filePath);
+            File outputFile = new File(SERVER_FILES_DIRECTORY + path.getFileName().toString());
+            receiveAndSaveFile(connection, outputFile);
+
+        } catch (IOException e) {
+            handleFileReceiveError(e);
+        }
+    }
+
+    private void receiveAndSaveFile(ChatConnection connection, File outputFile) throws IOException {
+        try (
+                InputStream fileStream = new BufferedInputStream(connection.getSocket().getInputStream());
+                OutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
+        ) {
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fileStream.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, bytesRead);
+            }
+            System.out.println("File received and saved: " + outputFile.getAbsolutePath());
+        }
+    }
+
+
+    private void handleFileReceiveError(IOException e) {
+        System.out.println("Error receiving file: " + e.getMessage());
     }
 }

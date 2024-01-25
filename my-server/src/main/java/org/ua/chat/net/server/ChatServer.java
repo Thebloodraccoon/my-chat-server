@@ -1,5 +1,7 @@
 package org.ua.chat.net.server;
 
+import lombok.Getter;
+import org.ua.chat.net.command.Command;
 import org.ua.chat.net.command.CommandManager;
 import org.ua.chat.net.command.ExitCommand;
 import org.ua.chat.net.command.FileCommand;
@@ -15,36 +17,26 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChatServer implements Server, ChatHandler, AutoCloseable {
-    private static final int DEFAULT_THREAD_COUNT = 2;
-    private static final int DEFAULT_PORT = 8080;
-
     private final ServerSocket serverSocket;
+    @Getter
     private final List<ChatConnection> connections = new ArrayList<>();
     private final CommandManager commandManager = new CommandManager();
-
     private final ExecutorService executorService;
 
 
     public ChatServer(int port, int threads) throws IOException {
-        serverSocket = new ServerSocket(port);
-        executorService = Executors.newFixedThreadPool(threads);
+        this.serverSocket = new ServerSocket(port);
+        this.executorService = Executors.newFixedThreadPool(threads);
 
-        commandManager.registerCommand("-exit", new ExitCommand());
-        commandManager.registerCommand("-file", new FileCommand());
+        initializeCommandManager();
     }
 
-    public ChatServer(int port) throws IOException {
-        this(port, DEFAULT_THREAD_COUNT);
+    private void initializeCommandManager() {
+        Command exit = new ExitCommand();
+        Command file = new FileCommand();
 
-        commandManager.registerCommand("-exit", new ExitCommand());
-        commandManager.registerCommand("-file", new FileCommand());
-    }
-
-    public ChatServer() throws IOException {
-        this(DEFAULT_PORT, DEFAULT_THREAD_COUNT);
-
-        commandManager.registerCommand("-exit", new ExitCommand());
-        commandManager.registerCommand("-file", new FileCommand());
+        commandManager.registerCommand("-exit", exit);
+        commandManager.registerCommand("-file", file);
     }
 
     @Override
@@ -76,8 +68,9 @@ public class ChatServer implements Server, ChatHandler, AutoCloseable {
         try {
             String[] parts = commandMessage.split(" ", 2);
             String commandName = parts[0];
+            String arg = parts[1];
 
-            commandManager.executeCommand(connection, commandName,  parts.length > 1 ? parts[1].split(" ") : new String[0]);
+            commandManager.executeCommand(connection, commandName, arg);
 
         } catch (Exception e) {
             throw new RuntimeException(e);

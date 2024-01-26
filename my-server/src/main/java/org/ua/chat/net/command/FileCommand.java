@@ -24,11 +24,11 @@ public class FileCommand implements Command {
     private void receiveAndSaveFile(ChatConnection connection, File outputFile) throws IOException {
         try (
                 InputStream fileStream = new BufferedInputStream(connection.getSocket().getInputStream());
-                OutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
+                BufferedOutputStream fileOutputStream = new BufferedOutputStream(new FileOutputStream(outputFile))
         ) {
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[8192];
             int bytesRead;
-            while ((bytesRead = fileStream.read(buffer)) != -1) {
+            while ((bytesRead = fileStream.read(buffer)) >= 0) {
                 fileOutputStream.write(buffer, 0, bytesRead);
             }
             System.out.println("File received and saved: " + outputFile.getAbsolutePath());

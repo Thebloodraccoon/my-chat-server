@@ -31,7 +31,6 @@ public class ThreadChatConnection implements ChatConnection, Runnable {
         return "client-" + random.nextInt(1000);
     }
 
-
     @Override
     public void sendMessage(String message) {
         writer.println(message);

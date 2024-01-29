@@ -6,6 +6,8 @@ import java.util.Scanner;
 
 public class ChatClient implements Client {
     private final Socket socket;
+    private PrintWriter writer;
+    private BufferedReader reader;
 
     public ChatClient(String host, int port) throws IOException {
         this.socket = new Socket(host, port);
@@ -16,52 +18,56 @@ public class ChatClient implements Client {
         try (
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
-                PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream));
-                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
+                Scanner scanner = new Scanner(System.in)
         ) {
 
-            while (true) {
-                String s = reader.readLine();
-                System.out.println(s);
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+            writer = new PrintWriter(new OutputStreamWriter(outputStream), true);
 
-                final Scanner scanner = new Scanner(System.in);
-                final String message = scanner.nextLine();
-
-                if (!message.isEmpty()) {
-                    if (message.equals("-exit")) {
-                        close();
-                        break;
-                    }
-
-                    if (message.startsWith("-file ")) {
-                        sendFile(message, outputStream);
-                    } else {
-                        writer.println(message);
-                        writer.flush();
-                    }
-                }
-            }
-
-        } catch (Exception e) {
+            handleUserInput(scanner);
+        } catch (IOException e) {
+            System.err.println("Error during communication: " + e.getMessage());
             throw new RuntimeException(e);
         } finally {
             close();
         }
     }
 
-    public void sendFile(String userCommand, OutputStream outputStream) {
-        String filePath = userCommand.substring("-file ".length()).trim();
+    private void handleUserInput( Scanner scanner) throws IOException {
+        while (true) {
+            String receivedMessage = reader.readLine();
+            System.out.println(receivedMessage);
 
+            String userMessage = scanner.nextLine();
+
+            if (!userMessage.isEmpty()) {
+                if (userMessage.equals("-exit")) {
+                    close();
+                    break;
+                }
+
+                if (userMessage.startsWith("-file ")) {
+                    sendFile(userMessage.substring("-file ".length()).trim(), writer);
+                } else {
+                    writer.println(userMessage);
+                }
+            }
+        }
+    }
+
+    private void sendFile(String filePath, PrintWriter writer) {
         try (BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(filePath))) {
             byte[] buffer = new byte[8192];
             int bytesRead;
             while ((bytesRead = fileStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-                outputStream.flush();
+                writer.println("Sending file...");
+                writer.flush();
+                socket.getOutputStream().write(buffer, 0, bytesRead);
+                socket.getOutputStream().flush();
             }
             System.out.println("File was sent!!!");
         } catch (IOException e) {
-            System.out.println("Error sending file: " + e.getMessage());
+            System.err.println("Error sending file: " + e.getMessage());
         }
     }
 

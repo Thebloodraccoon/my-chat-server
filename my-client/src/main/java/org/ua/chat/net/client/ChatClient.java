@@ -34,7 +34,7 @@ public class ChatClient implements Client {
                     }
 
                     if (message.startsWith("-file ")) {
-                        sendFile(message, writer, outputStream);
+                        sendFile(message, outputStream);
                     } else {
                         writer.println(message);
                         writer.flush();
@@ -49,21 +49,17 @@ public class ChatClient implements Client {
         }
     }
 
-    private void sendFile(String userCommand, PrintWriter writer, OutputStream outputStream) {
-        try {
-            String filePath = userCommand.substring("-file ".length()).trim();
+    public void sendFile(String userCommand, OutputStream outputStream) {
+        String filePath = userCommand.substring("-file ".length()).trim();
 
-            writer.println(userCommand);
-            writer.flush();
-
-            try (BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(filePath))) {
-                byte[] buffer = new byte[8192];
-                int bytesRead;
-                while ((bytesRead = fileStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
+        try (BufferedInputStream fileStream = new BufferedInputStream(new FileInputStream(filePath))) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = fileStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
                 outputStream.flush();
             }
+            System.out.println("File was sent!!!");
         } catch (IOException e) {
             System.out.println("Error sending file: " + e.getMessage());
         }

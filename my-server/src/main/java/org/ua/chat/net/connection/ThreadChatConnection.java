@@ -3,6 +3,7 @@ package org.ua.chat.net.connection;
 
 import lombok.EqualsAndHashCode;
 import org.ua.chat.net.server.ChatHandler;
+import org.ua.chat.net.server.ChatServer;
 
 import java.io.*;
 import java.net.Socket;

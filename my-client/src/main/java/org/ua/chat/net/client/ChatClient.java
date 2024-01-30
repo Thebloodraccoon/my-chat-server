@@ -6,11 +6,14 @@ import java.util.Scanner;
 
 public class ChatClient implements Client {
     private final Socket socket;
-    private PrintWriter writer;
-    private BufferedReader reader;
+
 
     public ChatClient(String host, int port) throws IOException {
         this.socket = new Socket(host, port);
+    }
+
+    public ChatClient(Socket socket) {
+        this.socket = socket;
     }
 
     @Override
@@ -18,13 +21,11 @@ public class ChatClient implements Client {
         try (
                 InputStream inputStream = socket.getInputStream();
                 OutputStream outputStream = socket.getOutputStream();
-                Scanner scanner = new Scanner(System.in)
+                Scanner scanner = new Scanner(System.in);
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                PrintWriter writer = new PrintWriter(new OutputStreamWriter(outputStream), true);
         ) {
-
-            reader = new BufferedReader(new InputStreamReader(inputStream));
-            writer = new PrintWriter(new OutputStreamWriter(outputStream), true);
-
-            handleUserInput(scanner);
+            handleUserInput(scanner, writer, reader);
         } catch (IOException e) {
             System.err.println("Error during communication: " + e.getMessage());
             throw new RuntimeException(e);
@@ -33,7 +34,7 @@ public class ChatClient implements Client {
         }
     }
 
-    private void handleUserInput( Scanner scanner) throws IOException {
+    public void handleUserInput(Scanner scanner, PrintWriter writer, BufferedReader reader) throws IOException {
         while (true) {
             String receivedMessage = reader.readLine();
             System.out.println(receivedMessage);

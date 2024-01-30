@@ -1,53 +1,50 @@
 package org.ua.chat.net.client;
 
 
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+
+import java.io.*;
+import java.net.Socket;
+import java.util.Scanner;
+
+import org.mockito.MockitoAnnotations;
+
+import static org.mockito.Mockito.*;
+
+
 class ChatClientTest {
-//    @@Test
-//    void testSendMessage() throws Exception {
-//        Socket mockSocket = mock(Socket.class);
-//        OutputStream mockOutputStream = mock(OutputStream.class);
-//        PrintWriter mockPrintWriter = mock(PrintWriter.class);
-//
-//        when(mockSocket.getOutputStream()).thenReturn(mockOutputStream);
-//        whenNew(PrintWriter.class).withArguments(mockOutputStream, true).thenReturn(mockPrintWriter);
-//
-//        ChatClient chatClient = new ChatClient(mockSocket);
-//
-//        chatClient.sendMessage("Hello");
-//
-//        verify(mockPrintWriter).println("Hello");
-//        verify(mockPrintWriter).flush();
-//    }
-//
-//    @Test
-//    void testReceiveMessage() throws IOException {
-//        Socket mockSocket = mock(Socket.class);
-//        InputStream mockInputStream = mock(InputStream.class);
-//        BufferedReader mockBufferedReader = mock(BufferedReader.class);
-//
-//        when(mockSocket.getInputStream()).thenReturn(mockInputStream);
-//        whenNew(BufferedReader.class).withArguments(new InputStreamReader(mockInputStream)).thenReturn(mockBufferedReader);
-//
-//        when(mockBufferedReader.readLine()).thenReturn("Server response");
-//
-//        ChatClient chatClient = new ChatClient(mockSocket);
-//
-//        String message = chatClient.receiveMessage();
-//
-//        assertEquals("Server response", message);
-//    }
-//
-//    @Test
-//    void testSendFile() throws IOException {
-//        Socket mockSocket = mock(Socket.class);
-//        OutputStream mockOutputStream = mock(OutputStream.class);
-//
-//        when(mockSocket.getOutputStream()).thenReturn(mockOutputStream);
-//
-//        ChatClient chatClient = new ChatClient(mockSocket);
-//
-//        chatClient.sendFile("test-file.txt");
-//
-//        // Add verification based on your implementation
-//    }
+    private ChatClient client;
+
+    private Socket mockSocket;
+
+    private Scanner mockScanner;
+
+    private PrintWriter mockPrintWriter;
+
+    private BufferedReader mockReader;
+
+    @BeforeEach
+    public void setUp() {
+        mockSocket = mock(Socket.class);
+        mockReader = mock(BufferedReader.class);
+        mockScanner = mock(Scanner.class);
+        mockPrintWriter = mock(PrintWriter.class);
+        client = new ChatClient(mockSocket);
+    }
+
+    @Test
+    void testHandleUserInput() throws Exception {
+        when(mockReader.readLine())
+                .thenReturn("Server response");
+
+        when(mockScanner.nextLine())
+                .thenReturn("hello");
+
+        client.handleUserInput(mockScanner, mockPrintWriter, mockReader);
+
+        verify(mockPrintWriter).println("hello");
+    }
 }

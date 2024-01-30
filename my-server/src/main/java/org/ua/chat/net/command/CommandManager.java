@@ -12,7 +12,7 @@ public class CommandManager {
         commands.put(commandName, command);
     }
 
-    public void executeCommand(ChatConnection connection, String commandName, String arg) throws Exception {
+    public void executeCommand(ChatConnection connection, String commandName, String arg) {
         Command command = commands.get(commandName);
         if (command != null) {
             command.execute(connection, arg);

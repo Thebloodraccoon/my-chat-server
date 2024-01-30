@@ -68,7 +68,7 @@ public class ChatServer implements Server, ChatHandler, AutoCloseable {
         try {
             String[] parts = commandMessage.split(" ", 2);
             String commandName = parts[0];
-            String arg = parts[1];
+            String arg = " " + parts[1];
 
             commandManager.executeCommand(connection, commandName, arg);
 
@@ -95,5 +95,9 @@ public class ChatServer implements Server, ChatHandler, AutoCloseable {
         }
 
         executorService.shutdownNow();
+    }
+
+    public boolean isClosed() {
+        return serverSocket.isClosed();
     }
 }

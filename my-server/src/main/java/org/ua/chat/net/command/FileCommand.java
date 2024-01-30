@@ -30,6 +30,7 @@ public class FileCommand implements Command {
             int bytesRead;
             while ((bytesRead = fileStream.read(buffer)) >= 0) {
                 fileOutputStream.write(buffer, 0, bytesRead);
+                fileOutputStream.flush();
             }
             System.out.println("File received and saved: " + outputFile.getAbsolutePath());
         }

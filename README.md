@@ -9,6 +9,6 @@ Server supports a set of special commands to clients:
     -file file_path_here - Sends a file to the server.
 
 The "client" is represented by a separate maven module.
-The client is able to connect to the server, receive messages from the server and transmit
+The client is able to connect to the server, receive messages from the server and transmit.
 
 
